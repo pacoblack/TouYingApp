@@ -1,76 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#121212"
-    android:baselineAligned="false"
-    android:orientation="horizontal"
-    android:padding="36dp"
+<layout xmlns:app="http://android.com"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 左侧：二维码与访问地址 -->
-    <LinearLayout
-        android:layout_width="0dp"
+    <data>
+        <variable
+            name="vm"
+            type="com.find.gang.file.viewmodel.TransferViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:background="#121212"
+        android:fillViewport="true">
 
-        <ImageView
-            android:id="@+id/ivQrCode"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:background="#FFFFFF"
-            android:padding="12dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="手机扫码 或 浏览器输入以下地址"
-            android:textColor="#AAAAAA"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tvServerUrl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="正在获取局域网地址..."
-            android:textColor="#4FC3F7"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- 右侧：实时接收记录 -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1.3"
-        android:background="#1E1E1E"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="最新接收内容（文字已自动复制到剪贴板）"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="16dp">
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- 1. 顶部：二维码（通过自定义 BindingAdapter 绑定 Bitmap） -->
+            <ImageView
+                android:id="@+id/ivQrCode"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                app:imageBitmap="@{vm.qrCodeBitmap}" />
+
+            <!-- 2. 地址提示 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="手机扫码 或 浏览器输入以下地址"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvLog"
+                android:id="@+id/tvServerUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{vm.serverUrl}"
+                android:textColor="#4FC3F7"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- 3. 文件接收记录 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="6dp"
-                android:text="等待连接传输...\n请确保手机/电脑与投影仪连接在同一个 Wi-Fi 下。"
-                android:textColor="#E0E0E0"
-                android:textSize="16sp" />
-        </ScrollView>
-    </LinearLayout>
-</LinearLayout>
+                android:layout_marginTop="16dp"
+                android:background="#1E1E1E"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文件接收记录："
+                    android:textColor="#BBBBBB"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvFileLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:lineSpacingExtra="4dp"
+                    android:maxLines="4"
+                    android:scrollbars="vertical"
+                    android:text="@{vm.fileLog}"
+                    android:textColor="#E0E0E0"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- 4. 最底部：接收文字输入框（双向绑定 + 按钮事件绑定） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="#1E1E1E"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="接收到的文字（支持选择与复制）："
+                        android:textColor="#81C784"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnCopyText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="#1A73E8"
+                        android:focusable="true"
+                        android:onClick="@{() -> vm.onCopyClick()}"
+                        android:paddingHorizontal="14dp"
+                        android:text="一键复制全部"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:id="@+id/btnClearText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:background="#424242"
+                        android:focusable="true"
+                        android:onClick="@{() -> vm.onClearClick()}"
+                        android:paddingHorizontal="14dp"
+                        android:text="清空"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/etReceivedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#121212"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="top|start"
+                    android:hint="手机或电脑推送的文字/网址将显示在这里..."
+                    android:inputType="textMultiLine"
+                    android:padding="10dp"
+                    android:scrollbars="vertical"
+                    android:text="@={vm.receivedText}"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#666666"
+                    android:textIsSelectable="true"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</layout>
