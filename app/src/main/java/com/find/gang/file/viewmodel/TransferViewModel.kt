@@ -64,7 +64,7 @@ class TransferViewModel(application: Application) : AndroidViewModel(application
             }
         )
 
-        server = TransferServer(port, repository, strategies).apply { start() }
+        server = TransferServer(port, getApplication(), repository, strategies).apply { start() }
     }
 
     fun onCopyClick() {
