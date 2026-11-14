@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 遥控器焦点选中状态：亮蓝色描边 + 浅蓝半透明填充 -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#264FC3F7" />
+            <stroke android:width="2.5dp" android:color="#4FC3F7" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <!-- 按下状态 -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#404FC3F7" />
+            <stroke android:width="2dp" android:color="#81D4FA" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <!-- 默认未选中状态 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#242424" />
+            <stroke android:width="1dp" android:color="#383838" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+</selector>
+

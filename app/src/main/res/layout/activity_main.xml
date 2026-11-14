@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://android.com"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -8,200 +8,317 @@
             type="com.find.gang.file.viewmodel.TransferViewModel" />
     </data>
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#121212"
-        android:fillViewport="true">
+        android:background="#0F0F0F"
+        android:orientation="vertical">
 
+        <!-- 1. 顶部横屏导航栏 -->
         <LinearLayout
+            android:id="@+id/topNavBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_height="68dp"
+            android:background="#181818"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="36dp">
 
-            <!-- 1. 顶部：二维码 -->
-            <ImageView
-                android:id="@+id/ivQrCode"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:background="#FFFFFF"
-                android:padding="10dp"
-                app:imageBitmap="@{vm.qrCodeBitmap}" />
-
-            <!-- 2. 地址提示 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="手机扫码 或 浏览器输入以下地址"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tvServerUrl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@{vm.serverUrl}"
+                android:layout_marginEnd="36dp"
+                android:text="投影仪快传"
                 android:textColor="#4FC3F7"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- 3. 存储目录展示与操作按钮 -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tabHome"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_tv_focus_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:nextFocusDown="@id/btnOpenDir"
+                android:nextFocusLeft="@id/tabVideo"
+                android:nextFocusRight="@id/tabBrowser"
+                android:text="首页传输"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabBrowser"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/bg_tv_focus_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:nextFocusDown="@id/btnOpenDir"
+                android:nextFocusLeft="@id/tabHome"
+                android:nextFocusRight="@id/tabVideo"
+                android:text="网页浏览"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabVideo"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_tv_focus_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:nextFocusDown="@id/btnCopyText"
+                android:nextFocusLeft="@id/tabBrowser"
+                android:nextFocusRight="@id/tabHome"
+                android:text="在线视频"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="#1E1E1E"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
+                android:text="遥控器方向键切换 · 确认键操作"
+                android:textColor="#888888"
+                android:textSize="15sp" />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvCurrentDir"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="1"
-                    android:ellipsize="middle"
-                    android:singleLine="true"
-                    android:text="当前保存目录：默认下载目录"
-                    android:textColor="#CCCCCC"
-                    android:textSize="13sp" />
-            </LinearLayout>
+        <!-- 2. 主内容容器 -->
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingHorizontal="36dp"
+            android:paddingVertical="24dp">
+
+            <!-- 首页传输双栏大屏布局 -->
             <LinearLayout
+                android:id="@+id/layoutHomeTransfer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="#1E1E1E"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
-                <Button
-                    android:id="@+id/btnOpenDir"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#2E7D32"
-                    android:focusable="true"
-                    android:paddingHorizontal="14dp"
-                    android:text="打开目录"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp" />
+                android:layout_height="match_parent"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btnSelectDir"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:background="#2C2C2C"
-                    android:focusable="true"
-                    android:paddingHorizontal="14dp"
-                    android:text="更改目录"
-                    android:textColor="#4FC3F7"
-                    android:textSize="13sp" />
-            </LinearLayout>
-            <!-- 4. 文件接收记录 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="#1E1E1E"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="文件接收记录："
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvFileLog"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:lineSpacingExtra="4dp"
-                    android:maxLines="4"
-                    android:scrollbars="vertical"
-                    android:text="@{vm.fileLog}"
-                    android:textColor="#E0E0E0"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- 5. 接收文字输入框 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="#1E1E1E"
-                android:orientation="vertical"
-                android:padding="14dp">
-
+                <!-- 左侧栏：扫码连接 & 存储目录控制 (权重 4.5) -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="24dp"
+                    android:layout_weight="4.5"
+                    android:background="#181818"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="接收到的文字（支持选择与复制）："
-                        android:textColor="#81C784"
-                        android:textSize="14sp"
+                        android:text="手机扫码连接投影仪"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <Button
-                        android:id="@+id/btnCopyText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="#1A73E8"
-                        android:focusable="true"
-                        android:onClick="@{() -> vm.onCopyClick()}"
-                        android:paddingHorizontal="14dp"
-                        android:text="一键复制全部"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp" />
+                    <!-- 二维码展示区（白色底框，确保暗光环境下手机摄像头极速识别） -->
+                    <TextView
+                        android:id="@+id/tvServerUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="#4FC3F7"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        tools:text="访问地址：http://192.168.1.100:8080" />
 
-                    <Button
-                        android:id="@+id/btnClearText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:background="#424242"
-                        android:focusable="true"
-                        android:onClick="@{() -> vm.onClearClick()}"
-                        android:paddingHorizontal="14dp"
-                        android:text="清空"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginVertical="10dp"
+                        android:layout_weight="1"
+                        android:background="#121212"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingVertical="10dp"
+                        android:paddingHorizontal="12dp">
+
+                        <!-- 二维码本体：去掉多余嵌套，直接吃满剩余垂直高度并保持 1:1 正方形 -->
+                        <ImageView
+                            android:id="@+id/ivQrCode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:adjustViewBounds="true"
+                            android:background="#FFFFFF"
+                            android:contentDescription="连接二维码"
+                            android:padding="10dp"
+                            android:scaleType="fitCenter" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="请确保手机与投影仪连接同一 Wi-Fi"
+                            android:textColor="#999999"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <!-- 当前保存目录信息 -->
+                    <TextView
+                        android:id="@+id/tvCurrentDir"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#121212"
+                        android:ellipsize="middle"
+                        android:maxLines="2"
+                        android:padding="12dp"
+                        android:textColor="#4FC3F7"
+                        android:textSize="15sp"
+                        tools:text="当前保存目录：/storage/emulated/0/Download" />
+
+                    <!-- 遥控器操作按钮组：打开目录 & 修改目录 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/btnOpenDir"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_tv_focus_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:nextFocusLeft="@id/btnCopyText"
+                            android:nextFocusRight="@id/btnSelectDir"
+                            android:nextFocusUp="@id/tabHome"
+                            android:text="📂 打开目录"
+                            android:textColor="#FFFFFF"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnSelectDir"
+                            android:layout_width="0dp"
+                            android:layout_height="52dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_tv_focus_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:nextFocusLeft="@id/btnOpenDir"
+                            android:nextFocusRight="@id/btnCopyText"
+                            android:nextFocusUp="@id/tabHome"
+                            android:text="⚙️ 修改目录"
+                            android:textColor="#FFFFFF"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <EditText
-                    android:id="@+id/etReceivedText"
-                    android:layout_width="match_parent"
-                    android:layout_height="110dp"
-                    android:layout_marginTop="8dp"
-                    android:background="#121212"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="top|start"
-                    android:hint="手机或电脑推送的文字/网址将显示在这里..."
-                    android:inputType="textMultiLine"
-                    android:padding="10dp"
-                    android:scrollbars="vertical"
-                    android:text="@={vm.receivedText}"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#666666"
-                    android:textIsSelectable="true"
-                    android:textSize="16sp" />
-            </LinearLayout>
+                <!-- 右侧栏：接收文本（一键复制） & 文件传输日志 (权重 5.5) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5.5"
+                    android:background="#181818"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-        </LinearLayout>
-    </ScrollView>
+                    <!-- 文本接收标题栏 + 一键复制按钮 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="接收到的剪贴板文本"
+                            android:textColor="#FFFFFF"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnCopyText"
+                            android:layout_width="150dp"
+                            android:layout_height="46dp"
+                            android:background="@drawable/bg_tv_focus_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:nextFocusDown="@id/etReceivedText"
+                            android:nextFocusLeft="@id/btnSelectDir"
+                            android:nextFocusUp="@id/tabVideo"
+                            android:text="📋 一键复制"
+                            android:textColor="#4FC3F7"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- 接收文本框 -->
+                    <EditText
+                        android:id="@+id/etReceivedText"
+                        android:layout_width="match_parent"
+                        android:layout_height="130dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_tv_focus_btn"
+                        android:focusable="true"
+                        android:gravity="top|start"
+                        android:hint="手机端发送的链接或文字将显示在这里..."
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine"
+                        android:nextFocusDown="@id/tvFileLog"
+                        android:nextFocusLeft="@id/btnSelectDir"
+                        android:nextFocusUp="@id/btnCopyText"
+                        android:padding="14dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#666666"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="文件传输记录"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFileLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tv_focus_btn"
+                        android:focusable="true"
+                        android:nextFocusLeft="@id/btnOpenDir"
+                        android:nextFocusUp="@id/etReceivedText"
+                        android:padding="14dp"
+                        android:scrollbars="vertical"
+                        android:textColor="#CCCCCC"
+                        android:textSize="15sp"
+                        tools:text="[18:40] 等待文件传输..." />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
 </layout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 允许访问外部存储根目录（覆盖 Download、Movies、Documents 等所有目录） -->
+    <external-path
+        name="external_files"
+        path="." />
+    <!-- 兼容部分投影仪系统的外置存储映射路径 -->
+    <root-path
+        name="root_files"
+        path="." />
+</paths>
