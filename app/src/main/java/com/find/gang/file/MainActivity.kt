@@ -20,12 +20,16 @@ import com.find.gang.file.databinding.ActivityMainBinding
 import com.find.gang.file.repository.TransferRepository
 import com.find.gang.file.viewmodel.TransferViewModel
 import java.io.File
+import androidx.core.net.toUri
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: TransferViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private lateinit var repository: TransferRepository
+
+    // 记录当前生效的存储目录路径，用于“打开目录”按钮跳转
+    private var currentDirPath: String = ""
 
     // 兼容 Android 10 及以下的权限请求回调
     private val requestPermissionLauncher = registerForActivityResult(
@@ -41,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
         uri?.let {
-            // 持久化 URI 授权，防止部分系统在重启后回收权限
             val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             try {
@@ -76,15 +79,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        // 允许文件接收记录文本框内部垂直滚动
         binding.tvFileLog.movementMethod = ScrollingMovementMethod()
 
-        // 初始化显示当前保存目录（如果 TransferRepository 有对应 getter，可直接替换默认值）
-        val defaultDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+        val defaultDir = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS
+        ).absolutePath
         updateCurrentDirDisplay(defaultDir)
     }
 
     private fun setupListeners() {
+        binding.btnOpenDir.setOnClickListener {
+            openDirectory(currentDirPath)
+        }
+
         binding.btnSelectDir.setOnClickListener {
             selectDirLauncher.launch(null)
         }
@@ -107,7 +114,63 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateCurrentDirDisplay(path: String) {
-        binding.tvCurrentDir.text = "当前保存目录：$path"
+        currentDirPath = path
+        binding.tvCurrentDir.text = buildString {
+            append("当前保存目录：")
+            append(path)
+        }
+    }
+
+    /**
+     * 兼容投影仪/TV及各版本 Android 系统打开指定文件夹
+     */
+    private fun openDirectory(dirPath: String) {
+        val dirFile = File(dirPath)
+        if (!dirFile.exists()) {
+            dirFile.mkdirs()
+        }
+
+        val rootPath = Environment.getExternalStorageDirectory().absolutePath
+        val relativePath = if (dirPath.startsWith(rootPath)) {
+            dirPath.removePrefix(rootPath).trimStart('/')
+        } else {
+            ""
+        }
+
+        // 方案 1：通过 DocumentsUI 标准 Uri 精准定位到目标文件夹
+        try {
+            val docId = if (relativePath.isEmpty()) "primary:" else "primary:$relativePath"
+            val docUri = DocumentsContract.buildDocumentUri(
+                "com.android.externalstorage.documents",
+                docId
+            )
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(docUri, DocumentsContract.Document.MIME_TYPE_DIR)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(intent)
+            return
+        } catch (_: Exception) {
+        }
+
+        // 方案 2：部分第三方 TV 文件管理器支持直接传入路径或 resource/folder MIME
+        try {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(dirPath.toUri(), "resource/folder")
+            }
+            startActivity(intent)
+            return
+        } catch (_: Exception) {
+        }
+
+        // 方案 3：降级打开系统文件管理器（至少让用户能快速进入文件管理浏览）
+        try {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            startActivity(intent)
+            Toast.makeText(this, "已打开文件管理器，请进入：$relativePath", Toast.LENGTH_LONG).show()
+        } catch (_: Exception) {
+            Toast.makeText(this, "当前系统未找到可用的文件管理器", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun resolveTreeUriToPath(uri: Uri): String? {
@@ -132,11 +195,10 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val intent = Intent(
                         Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        Uri.parse("package:$packageName")
+                        "package:$packageName".toUri()
                     )
                     startActivity(intent)
-                } catch (e: Exception) {
-                    // 部分TV/定制系统可能不支持按包名跳转，回退到通用权限设置页
+                } catch (_: Exception) {
                     try {
                         startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
                     } catch (ex: Exception) {
