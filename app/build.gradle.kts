@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.fragment.ktx)
@@ -65,4 +66,24 @@ dependencies {
     // 二维码生成核心库
     implementation(libs.core)
     implementation(libs.mmkv)
+
+    // 1. 核心播放器与 UI
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.androidx.media3.session)
+
+    // 2. 全流媒体协议支持 (HLS / DASH / SmoothStreaming / RTSP / RTMP)
+    implementation(libs.androidx.media3.exoplayer.hls)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.exoplayer.smoothstreaming)
+    implementation(libs.androidx.media3.exoplayer.rtsp)
+    implementation(libs.androidx.media3.datasource.rtmp)
+
+    // 3. 网络与本地磁盘缓存数据库
+    implementation(libs.androidx.media3.datasource.okhttp)
+    implementation(libs.androidx.media3.database)
+    implementation(libs.androidx.media3.extractor)
+
+
 }

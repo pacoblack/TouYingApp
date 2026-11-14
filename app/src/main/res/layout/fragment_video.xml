@@ -5,84 +5,194 @@
 
     <data>
         <variable
-            name="vm"
-            type="com.find.gang.file.viewmodel.TransferViewModel" />
+            name="viewModel"
+            type="com.find.gang.file.viewmodel.Media3PlayerViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#181818"
-        android:orientation="vertical"
+        android:background="#121212"
         android:padding="20dp">
 
-        <!-- 顶部标题 & 视频直链快捷输入 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+        <!-- 左侧：大屏视频渲染画布 -->
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/player_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#000000"
+            android:focusable="true"
+            android:nextFocusRight="@id/btn_play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/panel_controls"
+            app:layout_constraintHorizontal_weight="6.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:resize_mode="fit"
+            app:show_buffering="when_playing"
+            app:use_controller="true" />
+
+        <!-- 右侧：TV 遥控器操作面板 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/panel_controls"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:background="#1E1E1E"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="3.5"
+            app:layout_constraintStart_toEndOf="@id/player_view"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tv_panel_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:text="在线视频 &amp; 直链投屏"
+                android:text="流媒体播放控制台"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- 地址输入框 -->
             <EditText
-                android:id="@+id/etVideoStreamUrl"
+                android:id="@+id/et_stream_url"
                 android:layout_width="0dp"
-                android:layout_height="46dp"
-                android:layout_marginEnd="12dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_tv_focus_btn"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_tv_focus_button"
                 android:focusable="true"
-                android:gravity="center_vertical"
-                android:hint="输入或通过手机快传推送 m3u8 / mp4 视频链接..."
-                android:imeOptions="actionGo"
-                android:importantForAutofill="no"
+                android:hint="输入 mp4 / m3u8 / rtsp 地址"
                 android:inputType="textUri"
-                android:maxLines="1"
-                android:nextFocusDown="@id/rvVideoList"
-                android:nextFocusRight="@id/btnPlayStream"
-                android:paddingHorizontal="14dp"
+                android:maxLines="2"
+                android:nextFocusDown="@id/btn_play"
+                android:nextFocusLeft="@id/player_view"
+                android:padding="12dp"
                 android:textColor="#FFFFFF"
-                android:textColorHint="#777777"
-                android:textSize="15sp" />
+                android:textColorHint="#888888"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_panel_title" />
 
-            <TextView
-                android:id="@+id/btnPlayStream"
-                android:layout_width="130dp"
-                android:layout_height="46dp"
-                android:background="@drawable/bg_tv_focus_btn"
-                android:clickable="true"
+            <!-- 按钮 1：立即播放（默认聚焦控件） -->
+            <Button
+                android:id="@+id/btn_play"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_tv_focus_button"
                 android:focusable="true"
-                android:gravity="center"
-                android:nextFocusDown="@id/rvVideoList"
-                android:nextFocusLeft="@id/etVideoStreamUrl"
-                android:text="▶ 立即播放"
-                android:textColor="#4FC3F7"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:nextFocusDown="@id/btn_precache"
+                android:nextFocusLeft="@id/player_view"
+                android:nextFocusUp="@id/et_stream_url"
+                android:text="立即播放（边播边存）"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_stream_url" />
 
-        <!-- 视频推荐 / 历史网格列表：默认焦点控件，对应 getDefaultFocusViewId() -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvVideoList"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:descendantFocusability="afterDescendants"
-            android:focusable="true"
-            android:nextFocusDown="@id/tabVideo"
-            android:nextFocusUp="@id/etVideoStreamUrl"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="4"
-            tools:itemCount="8" />
-    </LinearLayout>
+            <!-- 按钮 2：后台静默预缓存 -->
+            <Button
+                android:id="@+id/btn_precache"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_tv_focus_button"
+                android:focusable="true"
+                android:nextFocusDown="@id/btn_pause"
+                android:nextFocusLeft="@id/player_view"
+                android:nextFocusUp="@id/btn_play"
+                android:text="仅后台预缓存"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_play" />
+
+            <!-- 按钮 3：暂停播放 -->
+            <Button
+                android:id="@+id/btn_pause"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_tv_focus_button"
+                android:focusable="true"
+                android:nextFocusDown="@id/btn_stop_cache"
+                android:nextFocusLeft="@id/player_view"
+                android:nextFocusUp="@id/btn_precache"
+                android:text="暂停播放"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_precache" />
+
+            <!-- 按钮 4：停止缓存 -->
+            <Button
+                android:id="@+id/btn_stop_cache"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_tv_focus_button"
+                android:enabled="@{viewModel.uiState.caching}"
+                android:focusable="true"
+                android:nextFocusLeft="@id/player_view"
+                android:nextFocusUp="@id/btn_pause"
+                android:text="停止后台缓存"
+                android:textColor="#CF6679"
+                app:backgroundTint="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_pause" />
+
+            <!-- 缓存进度条 -->
+            <ProgressBar
+                android:id="@+id/progress_cache"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="18dp"
+                android:max="100"
+                android:progress="@{viewModel.uiState.cacheProgress}"
+                android:progressTint="#03DAC5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_stop_cache" />
+
+            <!-- 实时播放/缓存状态 -->
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@{`状态：` + viewModel.uiState.statusText}"
+                android:textColor="#E0E0E0"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progress_cache"
+                tools:text="状态：正在播放（支持边放边存）" />
+
+            <!-- 已用缓存空间 -->
+            <TextView
+                android:id="@+id/tv_cache_usage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{viewModel.uiState.cacheUsageText}"
+                android:textColor="#03DAC5"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_status"
+                tools:text="本地缓存：12.50 MB / 2048 MB" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

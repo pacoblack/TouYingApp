@@ -1,11 +1,13 @@
 package com.find.gang.file.ui.fragment
 
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import com.find.gang.file.R
 import com.find.gang.file.databinding.FragmentHomeTransferBinding
 import com.find.gang.file.repository.TransferRepository
@@ -20,6 +22,7 @@ class HomeTransferFragment : BaseTvFragment<FragmentHomeTransferBinding>() {
     private var currentDirPath: String = ""
     private val serverPort = 8080
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private val selectDirLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
@@ -48,6 +51,7 @@ class HomeTransferFragment : BaseTvFragment<FragmentHomeTransferBinding>() {
 
     override fun getDefaultFocusViewId(): Int = R.id.btnOpenDir
 
+    @RequiresApi(Build.VERSION_CODES.FROYO)
     override fun initViews() {
         repository = TransferRepository(requireContext())
         binding.tvFileLog.movementMethod = ScrollingMovementMethod()
