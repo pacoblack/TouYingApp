@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </li>
     `).join('');
     const pendingCount = tasks.filter((t) => t.state === TASK_STATES.PENDING).length;
-    startUploadBtn.innerText = isUploading ? '正在传输中...' : 开始上传(${ pendingCount });
+    startUploadBtn.innerText = isUploading ? '正在传输中...' : `开始上传(${ pendingCount })`;
     startUploadBtn.disabled = isUploading || pendingCount === 0;
   });
   // 1. 文字发送逻辑

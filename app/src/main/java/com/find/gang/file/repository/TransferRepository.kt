@@ -5,13 +5,14 @@ import android.os.Environment
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import androidx.core.content.edit
 
 class TransferRepository(private val context: Context) {
 
     private val prefs = context.getSharedPreferences("transfer_config", Context.MODE_PRIVATE)
 
     fun setCustomRootDir(path: String) {
-        prefs.edit().putString("custom_root_dir", path).apply()
+        prefs.edit { putString("custom_root_dir", path) }
     }
 
     fun getBaseRootDir(): File {

@@ -21,7 +21,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- 1. 顶部：二维码（通过自定义 BindingAdapter 绑定 Bitmap） -->
+            <!-- 1. 顶部：二维码 -->
             <ImageView
                 android:id="@+id/ivQrCode"
                 android:layout_width="200dp"
@@ -49,11 +49,45 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <!-- 3. 文件接收记录 -->
+            <!-- 3. 存储目录展示与更改按钮 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
+                android:background="#1E1E1E"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tvCurrentDir"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:text="当前保存目录：默认下载目录"
+                    android:textColor="#CCCCCC"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnSelectDir"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:background="#2C2C2C"
+                    android:focusable="true"
+                    android:paddingHorizontal="14dp"
+                    android:text="更改目录"
+                    android:textColor="#4FC3F7"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- 4. 文件接收记录 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:background="#1E1E1E"
                 android:orientation="vertical"
                 android:padding="14dp">
@@ -79,11 +113,11 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- 4. 最底部：接收文字输入框（双向绑定 + 按钮事件绑定） -->
+            <!-- 5. 接收文字输入框 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:background="#1E1E1E"
                 android:orientation="vertical"
                 android:padding="14dp">
