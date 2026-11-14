@@ -61,4 +61,5 @@ dependencies {
     implementation(libs.nanohttpd)
     // 二维码生成核心库
     implementation(libs.core)
+    implementation(libs.mmkv)
 }

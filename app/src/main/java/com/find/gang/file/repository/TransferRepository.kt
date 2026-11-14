@@ -2,21 +2,22 @@ package com.find.gang.file.repository
 
 import android.content.Context
 import android.os.Environment
+import com.tencent.mmkv.MMKV
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import androidx.core.content.edit
 
 class TransferRepository(private val context: Context) {
 
-    private val prefs = context.getSharedPreferences("transfer_config", Context.MODE_PRIVATE)
+    // 使用与原 SharedPreferences 相同的名称作为 MMKV 实例 ID
+    private val mmkv = MMKV.mmkvWithID("transfer_config", MMKV.SINGLE_PROCESS_MODE)
 
     fun setCustomRootDir(path: String) {
-        prefs.edit { putString("custom_root_dir", path) }
+        mmkv.encode("custom_root_dir", path)
     }
 
     fun getBaseRootDir(): File {
-        val customPath = prefs.getString("custom_root_dir", null)
+        val customPath = mmkv.decodeString("custom_root_dir", null)
         if (!customPath.isNullOrEmpty()) {
             val customDir = File(customPath)
             if (!customDir.exists()) customDir.mkdirs()

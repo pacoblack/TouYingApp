@@ -1,0 +1,42 @@
+<!-- res/drawable/ic_tv_banner.xml -->
+<vector xmlns:aapt="http://android.com"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+
+    <!-- 1. 背景渐变填充 -->
+    <path android:pathData="M0,0h320v180h-320z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="320"
+                android:endY="180"
+                android:startX="0"
+                android:startY="0"
+                android:type="linear">
+                <item
+                    android:color="#FF1E3C72"
+                    android:offset="0" />
+                <item
+                    android:color="#FF2A5298"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 2. 装饰性半透明圆环 -->
+    <path
+        android:fillColor="#14FFFFFF"
+        android:pathData="M160,90m-62,0a62,62 0,1 1,124 0a62,62 0,1 1,-124 0" />
+
+    <!-- 3. 居中文件双向传输图标 -->
+    <group
+        android:translateX="132"
+        android:translateY="62">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M16.3,18.7L7,28l9.3,9.3v-7h16.3v-4.7H16.3V18.7z M49,28l-9.3,-9.3v7H23.3v4.7h16.3v7L49,28z" />
+    </group>
+
+</vector>
