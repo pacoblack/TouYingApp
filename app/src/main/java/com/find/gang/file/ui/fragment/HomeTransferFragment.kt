@@ -12,6 +12,7 @@ import com.find.gang.file.R
 import com.find.gang.file.databinding.FragmentHomeTransferBinding
 import com.find.gang.file.repository.TransferRepository
 import com.find.gang.file.ui.BaseTvFragment
+import com.find.gang.file.utils.ApkInstallHelper
 import com.find.gang.file.utils.DirectoryOpenChainFactory
 import com.find.gang.file.utils.TvDirectoryDialogs
 import com.find.gang.file.utils.TvSystemFacade
@@ -22,7 +23,6 @@ class HomeTransferFragment : BaseTvFragment<FragmentHomeTransferBinding>() {
     private var currentDirPath: String = ""
     private val serverPort = 8080
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private val selectDirLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
@@ -51,7 +51,6 @@ class HomeTransferFragment : BaseTvFragment<FragmentHomeTransferBinding>() {
 
     override fun getDefaultFocusViewId(): Int = R.id.btnOpenDir
 
-    @RequiresApi(Build.VERSION_CODES.FROYO)
     override fun initViews() {
         repository = TransferRepository(requireContext())
         binding.tvFileLog.movementMethod = ScrollingMovementMethod()
@@ -97,6 +96,19 @@ class HomeTransferFragment : BaseTvFragment<FragmentHomeTransferBinding>() {
     override fun observeData() {
         sharedViewModel.focusSelectEvent.observe(viewLifecycleOwner) { shouldSelect ->
             if (shouldSelect == true) binding.btnCopyText.requestFocus()
+        }
+
+        sharedViewModel.installApkEvent.observe(viewLifecycleOwner) { apkFile ->
+            apkFile ?: return@observe
+            sharedViewModel.consumeInstallApkEvent() // 防止屏幕旋转或页面重建时重复触发
+
+            runCatching {
+                ApkInstallHelper.installApk(requireContext(), apkFile) {
+                    showToast("请在系统设置中允许本应用安装未知来源应用")
+                }
+            }.onFailure {
+                showToast("自动拉起安装失败，请点击【打开目录】手动安装")
+            }
         }
     }
 

@@ -9,9 +9,11 @@ import com.find.gang.file.repository.TransferRepository
 import com.find.gang.file.server.FileTransferStrategy
 import com.find.gang.file.server.TextTransferStrategy
 import com.find.gang.file.server.TransferServer
+import com.find.gang.file.utils.ApkInstallHelper
 import com.find.gang.file.utils.ClipboardHelper
 import com.find.gang.file.utils.NetworkUtils
 import com.find.gang.file.utils.QrCodeUtils
+import java.io.File
 
 class TransferViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -38,6 +40,9 @@ class TransferViewModel(application: Application) : AndroidViewModel(application
     private val _focusSelectEvent = MutableLiveData<Boolean>()
     val focusSelectEvent: LiveData<Boolean> = _focusSelectEvent
 
+    private val _installApkEvent = MutableLiveData<File?>()
+    val installApkEvent: LiveData<File?> = _installApkEvent
+
     init {
         initServer()
     }
@@ -57,10 +62,17 @@ class TransferViewModel(application: Application) : AndroidViewModel(application
                 _toastEvent.postValue("收到新文字并已自动复制")
             },
             FileTransferStrategy(repository) { fileName, savedPath ->
+                val rawFile = File(savedPath)
+                val preparedApk = ApkInstallHelper.resolveAndPrepareApk(rawFile)
+                val finalFile = preparedApk ?: rawFile
+
                 val current = _fileLog.value ?: ""
-                val prefix =
-                    if (current.startsWith("等待上传")) "" else "\n----------------\n$current"
-                _fileLog.postValue("✅ $fileName\n路径: $savedPath$prefix")
+                val prefix = if (current.startsWith("等待上传")) "" else "\n----------------\n$current"
+                _fileLog.postValue("✅ ${finalFile.name}\n路径: ${finalFile.absolutePath}$prefix")
+
+                if (preparedApk != null) {
+                    _installApkEvent.postValue(preparedApk)
+                }
             }
         )
 
@@ -82,6 +94,10 @@ class TransferViewModel(application: Application) : AndroidViewModel(application
 
     fun consumeToast() {
         _toastEvent.value = null
+    }
+
+    fun consumeInstallApkEvent() {
+        _installApkEvent.value = null
     }
 
     override fun onCleared() {
