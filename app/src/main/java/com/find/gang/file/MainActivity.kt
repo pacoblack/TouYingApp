@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         val initialTab = savedInstanceState?.getString("CURRENT_TAB")
             ?.let { runCatching { NavTab.valueOf(it) }.getOrNull() }
-            ?: NavTab.HOME
+            ?: NavTab.VIDEO
 
         navCoordinator.switchTo(initialTab)
     }

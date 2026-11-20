@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-
+    implementation(libs.android.material)
     implementation(libs.androidx.appcompat)
     // 嵌入式轻量级 HTTP 服务器
     implementation(libs.nanohttpd)

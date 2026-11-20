@@ -25,6 +25,7 @@
 
         <!-- 2. 底部导航栏（三个控制按钮） -->
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/bottomNavBar"
             android:layout_width="match_parent"
             android:layout_height="68dp"
