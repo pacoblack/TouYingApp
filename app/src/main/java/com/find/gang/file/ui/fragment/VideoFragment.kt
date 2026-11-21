@@ -100,20 +100,28 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
         })
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        hasHandledInitialUrl = savedInstanceState?.getBoolean("has_handled_initial_url", false) ?: false
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("has_handled_initial_url", hasHandledInitialUrl)
+    }
+
     /** 解析外部传入的参数并触发初始行为 */
     private fun handleInitialArguments() {
         val passedUrl = arguments?.getString(ARG_STREAM_URL)?.trim()
         val autoPlay = arguments?.getBoolean(ARG_AUTO_PLAY, true) ?: true
 
-        if (!passedUrl.isNullOrBlank()) {
-            binding.etStreamUrl.setText(passedUrl)
-            // 防止配置变更重建时重复触发
-            if (autoPlay && !hasHandledInitialUrl) {
-                hasHandledInitialUrl = true
-                playerViewModel.dispatch(VideoAction.Play(passedUrl))
-            }
-        } else {
-            binding.etStreamUrl.setText(DEFAULT_TEST_URL)
+        // 未传参时兜底使用默认测试地址
+        val targetUrl = if (!passedUrl.isNullOrBlank()) passedUrl else DEFAULT_TEST_URL
+        binding.etStreamUrl.setText(targetUrl)
+
+        if (autoPlay && !hasHandledInitialUrl) {
+            hasHandledInitialUrl = true
+            playerViewModel.dispatch(VideoAction.Play(targetUrl))
         }
     }
 
