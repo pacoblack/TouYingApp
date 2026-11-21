@@ -12,187 +12,152 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#121212"
-        android:padding="20dp">
+        android:background="#F7F9FC">
 
-        <!-- 左侧：大屏视频渲染画布 -->
+        <!-- 顶部：16:9 手机视频播放器 -->
         <androidx.media3.ui.PlayerView
             android:id="@+id/player_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#000000"
-            android:focusable="true"
-            android:nextFocusRight="@id/btn_play"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/panel_controls"
-            app:layout_constraintHorizontal_weight="6.5"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:resize_mode="fit"
             app:show_buffering="when_playing"
             app:use_controller="true" />
 
-        <!-- 右侧：TV 遥控器操作面板 -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/panel_controls"
+        <!-- 底部：可滚动操作区域 -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:background="#1E1E1E"
-            android:padding="16dp"
+            android:fillViewport="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="3.5"
-            app:layout_constraintStart_toEndOf="@id/player_view"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/player_view">
 
-            <TextView
-                android:id="@+id/tv_panel_title"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="流媒体播放控制台"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <!-- 地址输入框 -->
-            <EditText
-                android:id="@+id/et_stream_url"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_tv_focus_button"
-                android:focusable="true"
-                android:hint="输入 mp4 / m3u8 / rtsp 地址"
-                android:inputType="textUri"
-                android:maxLines="2"
-                android:nextFocusDown="@id/btn_play"
-                android:nextFocusLeft="@id/player_view"
-                android:padding="12dp"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#888888"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_panel_title" />
+                <TextView
+                    android:id="@+id/tv_panel_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="流媒体播放控制台"
+                    android:textColor="#1A1C1E"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            <!-- 按钮 1：立即播放（默认聚焦控件） -->
-            <Button
-                android:id="@+id/btn_play"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_tv_focus_button"
-                android:focusable="true"
-                android:nextFocusDown="@id/btn_precache"
-                android:nextFocusLeft="@id/player_view"
-                android:nextFocusUp="@id/et_stream_url"
-                android:text="立即播放（边播边存）"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_stream_url" />
+                <!-- 原生输入框 -->
+                <EditText
+                    android:id="@+id/et_stream_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@android:drawable/edit_text"
+                    android:hint="输入 mp4 / m3u8 / rtsp 地址"
+                    android:inputType="textUri"
+                    android:maxLines="2"
+                    android:padding="12dp"
+                    android:textColor="#1A1C1E"
+                    android:textColorHint="#74777F"
+                    android:textSize="14sp" />
 
-            <!-- 按钮 2：后台静默预缓存 -->
-            <Button
-                android:id="@+id/btn_precache"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_tv_focus_button"
-                android:focusable="true"
-                android:nextFocusDown="@id/btn_pause"
-                android:nextFocusLeft="@id/player_view"
-                android:nextFocusUp="@id/btn_play"
-                android:text="仅后台预缓存"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_play" />
+                <!-- 按钮 1：立即播放 -->
+                <Button
+                    android:id="@+id/btn_play"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#0061A4"
+                    android:text="立即播放（边播边存）"
+                    android:textColor="#FFFFFF" />
 
-            <!-- 按钮 3：暂停播放 -->
-            <Button
-                android:id="@+id/btn_pause"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_tv_focus_button"
-                android:focusable="true"
-                android:nextFocusDown="@id/btn_stop_cache"
-                android:nextFocusLeft="@id/player_view"
-                android:nextFocusUp="@id/btn_precache"
-                android:text="暂停播放"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_precache" />
+                <!-- 按钮 2 & 3：并排排列 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
-            <!-- 按钮 4：停止缓存 -->
-            <Button
-                android:id="@+id/btn_stop_cache"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_tv_focus_button"
-                android:enabled="@{viewModel.uiState.caching}"
-                android:focusable="true"
-                android:nextFocusLeft="@id/player_view"
-                android:nextFocusUp="@id/btn_pause"
-                android:text="停止后台缓存"
-                android:textColor="#CF6679"
-                app:backgroundTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_pause" />
+                    <Button
+                        android:id="@+id/btn_precache"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#D1E4FF"
+                        android:text="后台预缓存"
+                        android:textColor="#001D36" />
 
-            <!-- 缓存进度条 -->
-            <ProgressBar
-                android:id="@+id/progress_cache"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_height="8dp"
-                android:layout_marginTop="18dp"
-                android:max="100"
-                android:progress="@{viewModel.uiState.cacheProgress}"
-                android:progressTint="#03DAC5"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_stop_cache" />
+                    <Button
+                        android:id="@+id/btn_pause"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#E0E2EC"
+                        android:text="暂停播放"
+                        android:textColor="#1A1C1E" />
+                </LinearLayout>
 
-            <!-- 实时播放/缓存状态 -->
-            <TextView
-                android:id="@+id/tv_status"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@{`状态：` + viewModel.uiState.statusText}"
-                android:textColor="#E0E0E0"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/progress_cache"
-                tools:text="状态：正在播放（支持边放边存）" />
+                <!-- 按钮 4：停止后台缓存 -->
+                <Button
+                    android:id="@+id/btn_stop_cache"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#FFDAD6"
+                    android:enabled="@{viewModel.uiState.caching}"
+                    android:text="停止后台缓存"
+                    android:textColor="#410002" />
 
-            <!-- 已用缓存空间 -->
-            <TextView
-                android:id="@+id/tv_cache_usage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@{viewModel.uiState.cacheUsageText}"
-                android:textColor="#03DAC5"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_status"
-                tools:text="本地缓存：12.50 MB / 2048 MB" />
+                <!-- 状态与缓存信息容器 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="#ECEEF4"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/tv_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{`状态：` + viewModel.uiState.statusText}"
+                        android:textColor="#1A1C1E"
+                        android:textSize="14sp"
+                        tools:text="状态：正在播放（支持边放边存）" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_cache"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="12dp"
+                        android:max="100"
+                        android:progress="@{viewModel.uiState.cacheProgress}"
+                        android:progressTint="#0061A4" />
+
+                    <TextView
+                        android:id="@+id/tv_cache_usage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{viewModel.uiState.cacheUsageText}"
+                        android:textColor="#0061A4"
+                        android:textSize="12sp"
+                        tools:text="本地缓存：12.50 MB / 2048 MB" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
