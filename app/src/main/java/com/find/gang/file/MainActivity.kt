@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             fragmentManager = supportFragmentManager,
             containerId = R.id.fragmentContainer,
             tabViews = mapOf(
-                NavTab.HOME to binding.tabHome,
+//                NavTab.HOME to binding.tabHome,
                 NavTab.BROWSER to binding.tabBrowser,
                 NavTab.VIDEO to binding.tabVideo
             )
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         val initialTab = savedInstanceState?.getString("CURRENT_TAB")
             ?.let { runCatching { NavTab.valueOf(it) }.getOrNull() }
-            ?: NavTab.VIDEO
+            ?: NavTab.BROWSER
 
         navCoordinator.switchTo(initialTab)
     }

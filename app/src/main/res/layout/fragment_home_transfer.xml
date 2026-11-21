@@ -101,7 +101,6 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:nextFocusDown="@id/tabHome"
                     android:nextFocusLeft="@id/btnCopyText"
                     android:nextFocusRight="@id/btnSelectDir"
                     android:text="打开目录"
