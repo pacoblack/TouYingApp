@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,14 +18,16 @@ import com.find.gang.file.media.TvChannel
 import com.find.gang.file.media.TvChannelGroup
 import com.find.gang.file.ui.BaseTvFragment
 import kotlinx.coroutines.launch
-import androidx.core.graphics.toColorInt
 
 /**
- * IPTV 频道播放列表页面（继承 BaseTvFragment 统一管理 DataBinding 与 TV 遥控器焦点）
+ * IPTV 频道播放列表页面（保留分类 Tab 选中状态与缓存列表，返回时不重置）
  */
 class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
 
+    // Fragment 实例级缓存：返回栈弹出重建视图时依然保留数据与选中索引
     private var groups: List<TvChannelGroup> = emptyList()
+    private var selectedGenreIndex: Int = 0
+
     private val channelAdapter = ChannelAdapter { channel ->
         openVideoPlayer(channel)
     }
@@ -49,14 +52,25 @@ class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
     override fun initListeners() {
         binding.rgGenres.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId in groups.indices) {
+                val isChanged = selectedGenreIndex != checkedId
+                selectedGenreIndex = checkedId
                 channelAdapter.submitList(groups[checkedId].channels)
-                binding.rvChannels.scrollToPosition(0)
+                // 仅在手动切换新 Tab 时回到顶部；从播放页返回恢复视图时保留原有滚动位置
+                if (isChanged) {
+                    binding.rvChannels.scrollToPosition(0)
+                }
             }
         }
     }
 
     override fun observeData() {
-        loadPlaylist()
+        if (groups.isNotEmpty()) {
+            // 已有内存缓存（例如从 VideoFragment 返回），直接恢复界面与选中 Tab，不再重新请求网络
+            binding.progressLoading.visibility = View.GONE
+            renderGenreTabs(isRestore = true)
+        } else {
+            loadPlaylist()
+        }
     }
 
     private fun loadPlaylist() {
@@ -69,38 +83,52 @@ class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
                 showToast("播放列表加载失败，请检查网络")
                 return@launch
             }
+            renderGenreTabs(isRestore = false)
+        }
+    }
 
-            binding.rgGenres.removeAllViews()
-            groups.forEachIndexed { index, group ->
-                val radioButton = RadioButton(requireContext()).apply {
-                    id = index
-                    text = buildString {
-                        append(group.genre)
-                        append(" (")
-                        append(group.channels.size)
-                        append(")")
-                    }
-                    buttonDrawable = null
-                    setPadding(32, 16, 32, 16)
-                    isFocusable = true
-                    isFocusableInTouchMode = false
-                    setOnFocusChangeListener { v, hasFocus ->
-                        v.setBackgroundColor(
-                            if (hasFocus) Color.parseColor("#331976D2") else Color.TRANSPARENT
-                        )
-                    }
-                    setOnCheckedChangeListener { buttonView, isChecked ->
-                        buttonView.setTextColor(
-                            if (isChecked) Color.parseColor("#1976D2") else Color.DKGRAY
-                        )
-                        buttonView.paint.isFakeBoldText = isChecked
-                    }
+    /** 渲染顶部分类标签并恢复之前选中的分类 */
+    private fun renderGenreTabs(isRestore: Boolean) {
+        binding.rgGenres.removeAllViews()
+        groups.forEachIndexed { index, group ->
+            val radioButton = RadioButton(requireContext()).apply {
+                id = index
+                text = buildString {
+                    append(group.genre)
+                    append(" (")
+                    append(group.channels.size)
+                    append(")")
                 }
-                binding.rgGenres.addView(radioButton)
+                buttonDrawable = null
+                setPadding(32, 16, 32, 16)
+                isFocusable = true
+                isFocusableInTouchMode = false
+                setOnFocusChangeListener { v, hasFocus ->
+                    v.setBackgroundColor(
+                        if (hasFocus) "#331976D2".toColorInt() else Color.TRANSPARENT
+                    )
+                }
+                setOnCheckedChangeListener { buttonView, isChecked ->
+                    buttonView.setTextColor(
+                        if (isChecked) "#1976D2".toColorInt() else Color.DKGRAY
+                    )
+                    buttonView.paint.isFakeBoldText = isChecked
+                }
             }
+            binding.rgGenres.addView(radioButton)
+        }
 
-            // 默认选中第一个分类并聚焦到频道列表，方便遥控器直接上下选台
-            (binding.rgGenres.getChildAt(0) as? RadioButton)?.isChecked = true
+        val targetIndex = selectedGenreIndex.coerceIn(0, groups.lastIndex)
+        val targetTab = binding.rgGenres.getChildAt(targetIndex) as? RadioButton
+        targetTab?.isChecked = true
+
+        // 确保顶部分类栏自动横向滚动到选中的 Tab 位置（防止卫视/地方频道等靠后的 Tab 跑出屏幕外）
+        targetTab?.post {
+            val scrollX = targetTab.left - (binding.scrollGenres.width - targetTab.width) / 2
+            binding.scrollGenres.smoothScrollTo(scrollX.coerceAtLeast(0), 0)
+        }
+
+        if (!isRestore) {
             binding.rvChannels.post {
                 requestDefaultFocus()
             }
