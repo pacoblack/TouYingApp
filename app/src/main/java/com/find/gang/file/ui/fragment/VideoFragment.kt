@@ -17,32 +17,40 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.util.UnstableApi
 import com.find.gang.file.databinding.FragmentVideoBinding
+import com.find.gang.file.media.TvChannel
 import com.find.gang.file.ui.BaseTvFragment
 import com.find.gang.file.viewmodel.Media3PlayerViewModel
 import com.find.gang.file.viewmodel.VideoAction
 
-/**
- * 手机端流媒体播放与离线缓存页面（支持外部传参播放、全屏切换与进度条拖动）
- */
 @OptIn(UnstableApi::class)
 class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
 
     companion object {
+        private const val ARG_CHANNEL_NAME = "arg_channel_name"
         private const val ARG_STREAM_URL = "arg_stream_url"
+        private const val ARG_STREAM_URLS = "arg_stream_urls"
         private const val ARG_AUTO_PLAY = "arg_auto_play"
-        private const val DEFAULT_TEST_URL = "http://bp-resource-dfl.bestv.cn/148/3/video.m3u8"
+        private const val DEFAULT_TEST_URL = "http://183.237.95.108:9901/tsfile/live/1008_1.m3u8?key=txiptv&playlive=0&authid=0"
 
-        /**
-         * 外部调用标准入口：创建带有初始播放地址的 VideoFragment
-         *
-         * @param url 视频/音频流地址 (mp4 / m3u8 / rtsp / rtmp 等)
-         * @param autoPlay 打开页面后是否立即自动播放，默认 true
-         */
         @JvmStatic
-        fun newInstance(url: String, autoPlay: Boolean = true): VideoFragment {
+        fun newInstance(channel: TvChannel, autoPlay: Boolean = true): VideoFragment {
             return VideoFragment().apply {
                 arguments = bundleOf(
+                    ARG_CHANNEL_NAME to channel.name,
+                    ARG_STREAM_URL to channel.primaryUrl,
+                    ARG_STREAM_URLS to ArrayList(channel.urls),
+                    ARG_AUTO_PLAY to autoPlay
+                )
+            }
+        }
+
+        @JvmStatic
+        fun newInstance(url: String, autoPlay: Boolean = true, title: String = ""): VideoFragment {
+            return VideoFragment().apply {
+                arguments = bundleOf(
+                    ARG_CHANNEL_NAME to title,
                     ARG_STREAM_URL to url,
+                    ARG_STREAM_URLS to arrayListOf(url),
                     ARG_AUTO_PLAY to autoPlay
                 )
             }
@@ -53,7 +61,10 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
     private var isFullscreen = false
     private var hasHandledInitialUrl = false
 
-    // 拦截系统返回键：全屏状态下按返回键优先退出全屏
+    private var channelName: String = ""
+    private var candidateUrls: List<String> = emptyList()
+    private var currentSourceIndex = 0
+
     private val backPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (isFullscreen) {
@@ -71,6 +82,18 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
 
     override fun getDefaultFocusViewId(): Int = 0
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        hasHandledInitialUrl = savedInstanceState?.getBoolean("has_handled_initial_url", false) ?: false
+        currentSourceIndex = savedInstanceState?.getInt("current_source_index", 0) ?: 0
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("has_handled_initial_url", hasHandledInitialUrl)
+        outState.putInt("current_source_index", currentSourceIndex)
+    }
+
     override fun initViews() {
         binding.viewModel = playerViewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -78,14 +101,12 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
 
-        // 启用 PlayerView 内置全屏按钮并绑定点击事件
         binding.playerView.setFullscreenButtonClickListener { enterFullscreen ->
             toggleFullscreen(enterFullscreen)
         }
         binding.playerView.setShowFastForwardButton(true)
         binding.playerView.setShowRewindButton(true)
 
-        // 处理外部传入的 URL 参数，未传入时使用默认测试地址
         handleInitialArguments()
 
         viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
@@ -100,24 +121,21 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
         })
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        hasHandledInitialUrl = savedInstanceState?.getBoolean("has_handled_initial_url", false) ?: false
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean("has_handled_initial_url", hasHandledInitialUrl)
-    }
-
-    /** 解析外部传入的参数并触发初始行为 */
     private fun handleInitialArguments() {
+        channelName = arguments?.getString(ARG_CHANNEL_NAME).orEmpty().trim()
         val passedUrl = arguments?.getString(ARG_STREAM_URL)?.trim()
+        val passedList = arguments?.getStringArrayList(ARG_STREAM_URLS)?.filter { it.isNotBlank() }.orEmpty()
         val autoPlay = arguments?.getBoolean(ARG_AUTO_PLAY, true) ?: true
 
-        // 未传参时兜底使用默认测试地址
-        val targetUrl = if (!passedUrl.isNullOrBlank()) passedUrl else DEFAULT_TEST_URL
+        candidateUrls = when {
+            passedList.isNotEmpty() -> passedList
+            !passedUrl.isNullOrBlank() -> listOf(passedUrl)
+            else -> listOf(DEFAULT_TEST_URL)
+        }
+
+        val targetUrl = candidateUrls.getOrElse(currentSourceIndex) { candidateUrls.first() }
         binding.etStreamUrl.setText(targetUrl)
+        updateChannelHeaderTitle()
 
         if (autoPlay && !hasHandledInitialUrl) {
             hasHandledInitialUrl = true
@@ -125,29 +143,51 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
         }
     }
 
-    /**
-     * 供外部宿主在 Fragment 已显示状态下动态切换播放地址
-     */
-    fun playExternalUrl(url: String, autoPlay: Boolean = true) {
-        val cleanUrl = url.trim()
-        if (cleanUrl.isBlank()) {
-            showToast("传入的视频地址无效")
+    private fun updateChannelHeaderTitle() {
+        if (channelName.isNotBlank()) {
+            val sourceTag = if (candidateUrls.size > 1) " (线路 ${currentSourceIndex + 1}/${candidateUrls.size})" else ""
+            activity?.title = "$channelName$sourceTag"
+        }
+    }
+
+    fun switchNextSource() {
+        if (candidateUrls.size <= 1) {
+            showToast("当前频道暂无其他备用线路")
             return
         }
-        // 更新 arguments 保持状态一致
+        currentSourceIndex = (currentSourceIndex + 1) % candidateUrls.size
+        val nextUrl = candidateUrls[currentSourceIndex]
+        binding.etStreamUrl.setText(nextUrl)
+        updateChannelHeaderTitle()
+        showToast("已切换至线路 ${currentSourceIndex + 1}/${candidateUrls.size}")
+        playerViewModel.dispatch(VideoAction.Play(nextUrl))
+    }
+
+    fun playChannel(channel: TvChannel, autoPlay: Boolean = true) {
+        if (channel.urls.isEmpty()) {
+            showToast("该频道暂无可用播放地址")
+            return
+        }
+        channelName = channel.name
+        candidateUrls = channel.urls
+        currentSourceIndex = 0
+
         arguments = (arguments ?: Bundle()).apply {
-            putString(ARG_STREAM_URL, cleanUrl)
+            putString(ARG_CHANNEL_NAME, channel.name)
+            putString(ARG_STREAM_URL, channel.primaryUrl)
+            putStringArrayList(ARG_STREAM_URLS, ArrayList(channel.urls))
             putBoolean(ARG_AUTO_PLAY, autoPlay)
         }
+
         if (isAdded && view != null) {
-            binding.etStreamUrl.setText(cleanUrl)
+            binding.etStreamUrl.setText(channel.primaryUrl)
+            updateChannelHeaderTitle()
             if (autoPlay) {
-                playerViewModel.dispatch(VideoAction.Play(cleanUrl))
+                playerViewModel.dispatch(VideoAction.Play(channel.primaryUrl))
             }
         }
     }
 
-    /** 切换全屏 / 竖屏状态 */
     private fun toggleFullscreen(enter: Boolean) {
         if (isFullscreen == enter) return
         isFullscreen = enter

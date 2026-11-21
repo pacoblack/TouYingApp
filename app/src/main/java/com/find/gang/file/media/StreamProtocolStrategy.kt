@@ -26,7 +26,6 @@ interface StreamProtocolStrategy {
     fun createDownloader(context: Context, url: String): Downloader? = null
 }
 
-/** 1. RTSP 实时监控/推流策略（强制 RTP over TCP 提升 Wi-Fi 稳定性） */
 @OptIn(UnstableApi::class)
 class RtspStrategy : StreamProtocolStrategy {
     override val protocolName = "RTSP 实时流"
@@ -39,7 +38,6 @@ class RtspStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 2. RTMP 直播推流策略 */
 @OptIn(UnstableApi::class)
 class RtmpStrategy : StreamProtocolStrategy {
     override val protocolName = "RTMP 直播流"
@@ -52,7 +50,6 @@ class RtmpStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 3. HLS (.m3u8) 直播/点播策略（智能跳过 m3u8 清单缓存 + 支持点播分片边播边存） */
 @OptIn(UnstableApi::class)
 class HlsStrategy : StreamProtocolStrategy {
     override val protocolName = "HLS (m3u8)"
@@ -72,7 +69,6 @@ class HlsStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 4. DASH (.mpd) 自适应流策略 */
 @OptIn(UnstableApi::class)
 class DashStrategy : StreamProtocolStrategy {
     override val protocolName = "DASH (mpd)"
@@ -91,7 +87,6 @@ class DashStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 5. SmoothStreaming (.ism) 策略 */
 @OptIn(UnstableApi::class)
 class SmoothStreamingStrategy : StreamProtocolStrategy {
     override val protocolName = "SmoothStreaming"
@@ -110,7 +105,6 @@ class SmoothStreamingStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 6. 通用点播视频/音频直链策略 (MP4 / MKV / FLV / WEBM / MP3 / AAC / FLAC 等) */
 @OptIn(UnstableApi::class)
 class ProgressiveMediaStrategy : StreamProtocolStrategy {
     override val protocolName = "点播音视频直链"
@@ -128,7 +122,6 @@ class ProgressiveMediaStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 策略路由工厂 */
 object StreamStrategyRouter {
     fun resolve(url: String): StreamProtocolStrategy {
         val lower = url.trim().lowercase()
