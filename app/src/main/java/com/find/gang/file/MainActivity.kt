@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -17,9 +18,10 @@ import androidx.databinding.DataBindingUtil
 import com.find.gang.file.databinding.ActivityMainBinding
 import com.find.gang.file.ui.BottomNavCoordinator
 import com.find.gang.file.ui.NavTab
+import com.find.gang.file.utils.OnFullscreenChangedListener
 import com.find.gang.file.viewmodel.TransferViewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnFullscreenChangedListener {
 
     private val viewModel: TransferViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
@@ -100,4 +102,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showToast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    override fun onFullscreenChanged(isFullscreen: Boolean) {
+        // 将下面的 bottomNav / tabLayout 替换为你 Activity 布局中底部两个 Tab 的实际控件 ID
+        binding.bottomNavBar.visibility = if (isFullscreen) View.GONE else View.VISIBLE
+    }
 }

@@ -6,6 +6,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
+interface OnFullscreenChangedListener {
+    fun onFullscreenChanged(isFullscreen: Boolean)
+}
+
 /**
  * 统一管理横竖屏切换与沉浸式系统栏显隐
  */
@@ -29,9 +33,10 @@ class ImmersiveFullscreenHelper(
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
         }
+
+        (activity as? OnFullscreenChangedListener)?.onFullscreenChanged(enter)
     }
 
-    /** 在视图销毁时确保恢复默认屏幕方向与系统栏显示 */
     fun release() {
         if (isFullscreen) {
             toggle(false)
