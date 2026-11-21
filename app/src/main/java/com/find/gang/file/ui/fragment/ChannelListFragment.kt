@@ -17,6 +17,7 @@ import com.find.gang.file.media.TvChannel
 import com.find.gang.file.media.TvChannelGroup
 import com.find.gang.file.ui.BaseTvFragment
 import kotlinx.coroutines.launch
+import androidx.core.graphics.toColorInt
 
 /**
  * IPTV 频道播放列表页面（继承 BaseTvFragment 统一管理 DataBinding 与 TV 遥控器焦点）
@@ -73,7 +74,12 @@ class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
             groups.forEachIndexed { index, group ->
                 val radioButton = RadioButton(requireContext()).apply {
                     id = index
-                    text = "${group.genre} (${group.channels.size})"
+                    text = buildString {
+                        append(group.genre)
+                        append(" (")
+                        append(group.channels.size)
+                        append(")")
+                    }
                     buttonDrawable = null
                     setPadding(32, 16, 32, 16)
                     isFocusable = true
@@ -127,7 +133,7 @@ class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
             view.isFocusable = true
             view.setOnFocusChangeListener { v, hasFocus ->
                 v.setBackgroundColor(
-                    if (hasFocus) Color.parseColor("#221976D2") else Color.TRANSPARENT
+                    if (hasFocus) "#221976D2".toColorInt() else Color.TRANSPARENT
                 )
             }
             return ViewHolder(view)

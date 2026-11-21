@@ -3,8 +3,8 @@ package com.find.gang.file.ui
 import androidx.annotation.IdRes
 import com.find.gang.file.R
 import com.find.gang.file.ui.fragment.BrowserFragment
+import com.find.gang.file.ui.fragment.ChannelListFragment
 import com.find.gang.file.ui.fragment.HomeTransferFragment
-import com.find.gang.file.ui.fragment.VideoFragment
 
 enum class NavTab(
     val tag: String,
@@ -17,7 +17,7 @@ enum class NavTab(
         override fun createFragment(): BaseTvFragment<*> = BrowserFragment()
     },
     VIDEO(tag = "TAB_VIDEO", buttonId = R.id.tabVideo) {
-        override fun createFragment(): BaseTvFragment<*> = VideoFragment()
+        override fun createFragment(): BaseTvFragment<*> = ChannelListFragment()
     };
 
     abstract fun createFragment(): BaseTvFragment<*>
