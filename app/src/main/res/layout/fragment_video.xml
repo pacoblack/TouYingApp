@@ -9,151 +9,269 @@
             type="com.find.gang.file.viewmodel.Media3PlayerViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F7F9FC">
+        android:background="#000000">
 
-        <!-- 顶部：16:9 手机视频播放器（自带可拖动进度条 + 全屏按钮） -->
+        <!-- 1. 主界面：沉浸式全屏播放器 -->
         <androidx.media3.ui.PlayerView
             android:id="@+id/player_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="#000000"
-            app:layout_constraintDimensionRatio="16:9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:resize_mode="fit"
             app:show_buffering="when_playing"
             app:use_controller="true" />
 
-        <!-- 底部：可滚动操作区域（增加了 id 供全屏时隐藏） -->
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_controls"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/player_view">
+        <!-- 2. 顶部悬浮返回按钮 + 当前频道名称标题栏（随播控条自动联动显隐） -->
+        <LinearLayout
+            android:id="@+id/layout_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@drawable/bg_top_overlay_gradient"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp">
 
+            <ImageButton
+                android:id="@+id/btn_top_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="返回"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/tv_top_channel_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="3"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="CCTV13 新闻" />
+
+            <TextView
+                android:id="@+id/tv_top_source_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="#66000000"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textColor="#E0F2FE"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="线路 1/3"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- 3. 右下角悬浮入口提示：点击或上滑呼出控制台抽屉 -->
+        <TextView
+            android:id="@+id/btn_open_drawer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="76dp"
+            android:background="#881A1C1E"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="▲ 控制台"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <!-- 4. 抽屉展开时的半透明背景遮罩（点击即可收起抽屉） -->
+        <View
+            android:id="@+id/view_drawer_scrim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="#80000000"
+            android:visibility="gone" />
+
+        <!-- 5. 底部上拉抽屉控制台 -->
+        <LinearLayout
+            android:id="@+id/drawer_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#F7F9FC"
+            android:clickable="true"
+            android:elevation="16dp"
+            android:focusable="true"
+            android:orientation="vertical">
+
+            <!-- 抽屉顶部拖拽指示条区域（支持向下滑动收起） -->
             <LinearLayout
+                android:id="@+id/layout_drawer_handle"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="#C4C6D0" />
+            </LinearLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroll_controls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tv_panel_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="流媒体播放控制台"
-                    android:textColor="#1A1C1E"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/et_stream_url"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@android:drawable/edit_text"
-                    android:hint="输入 mp4 / m3u8 / rtsp 地址"
-                    android:inputType="textUri"
-                    android:maxLines="2"
-                    android:padding="12dp"
-                    android:textColor="#1A1C1E"
-                    android:textColorHint="#74777F"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btn_play"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="16dp"
-                    android:backgroundTint="#0061A4"
-                    android:text="立即播放（边播边存）"
-                    android:textColor="#FFFFFF" />
+                android:fillViewport="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btn_precache"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#D1E4FF"
-                        android:text="后台预缓存"
-                        android:textColor="#001D36" />
-
-                    <Button
-                        android:id="@+id/btn_pause"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#E0E2EC"
-                        android:text="暂停播放"
-                        android:textColor="#1A1C1E" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_stop_cache"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#FFDAD6"
-                    android:enabled="@{viewModel.uiState.caching}"
-                    android:text="停止后台缓存"
-                    android:textColor="#410002" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:background="#ECEEF4"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:paddingHorizontal="16dp"
+                    android:paddingBottom="24dp">
 
-                    <TextView
-                        android:id="@+id/tv_status"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{`状态：` + viewModel.uiState.statusText}"
-                        android:textColor="#1A1C1E"
-                        android:textSize="14sp"
-                        tools:text="状态：正在播放（支持边放边存）" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <ProgressBar
-                        android:id="@+id/progress_cache"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="12dp"
-                        android:max="100"
-                        android:progress="@{viewModel.uiState.cacheProgress}"
-                        android:progressTint="#0061A4" />
+                        <TextView
+                            android:id="@+id/tv_panel_title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="流媒体播放控制台"
+                            android:textColor="#1A1C1E"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tv_cache_usage"
+                        <Button
+                            android:id="@+id/btn_switch_source"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:backgroundTint="#0061A4"
+                            android:paddingHorizontal="12dp"
+                            android:text="切换线路"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/et_stream_url"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="@{viewModel.uiState.cacheUsageText}"
-                        android:textColor="#0061A4"
-                        android:textSize="12sp"
-                        tools:text="本地缓存：12.50 MB / 2048 MB" />
+                        android:background="@android:drawable/edit_text"
+                        android:hint="输入 mp4 / m3u8 / rtsp 地址"
+                        android:inputType="textUri"
+                        android:maxLines="2"
+                        android:padding="10dp"
+                        android:textColor="#1A1C1E"
+                        android:textColorHint="#74777F"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:id="@+id/btn_play"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="#0061A4"
+                        android:text="立即播放（边播边存）"
+                        android:textColor="#FFFFFF" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_precache"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#D1E4FF"
+                            android:text="后台预缓存"
+                            android:textColor="#001D36" />
+
+                        <Button
+                            android:id="@+id/btn_pause"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#E0E2EC"
+                            android:text="暂停播放"
+                            android:textColor="#1A1C1E" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btn_stop_cache"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:backgroundTint="#FFDAD6"
+                        android:enabled="@{viewModel.uiState.caching}"
+                        android:text="停止后台缓存"
+                        android:textColor="#410002" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="#ECEEF4"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/tv_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@{`状态：` + viewModel.uiState.statusText}"
+                            android:textColor="#1A1C1E"
+                            android:textSize="13sp"
+                            tools:text="状态：正在播放（支持边放边存）" />
+
+                        <ProgressBar
+                            android:id="@+id/progress_cache"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:layout_marginTop="10dp"
+                            android:max="100"
+                            android:progress="@{viewModel.uiState.cacheProgress}"
+                            android:progressTint="#0061A4" />
+
+                        <TextView
+                            android:id="@+id/tv_cache_usage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@{viewModel.uiState.cacheUsageText}"
+                            android:textColor="#0061A4"
+                            android:textSize="12sp"
+                            tools:text="本地缓存：12.50 MB / 2048 MB" />
+                    </LinearLayout>
+
                 </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
 
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>

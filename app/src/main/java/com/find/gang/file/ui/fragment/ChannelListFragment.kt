@@ -142,11 +142,7 @@ class ChannelListFragment : BaseTvFragment<FragmentChannelListBinding>() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
             holder.title.text = item.name
-            holder.subtitle.text = if (item.urls.size > 1) {
-                "共 ${item.urls.size} 条线路 · ${item.primaryUrl}"
-            } else {
-                item.primaryUrl
-            }
+            holder.subtitle.text = ""
             holder.itemView.setOnClickListener { onClick(item) }
         }
 
