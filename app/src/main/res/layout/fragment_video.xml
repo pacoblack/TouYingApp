@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#000000"
-            app:resize_mode="fit"
+            app:resize_mode="zoom"
             app:show_buffering="when_playing"
             app:use_controller="true" />
 
@@ -33,9 +33,9 @@
             android:background="@drawable/bg_top_overlay_gradient"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="16dp">
+            android:paddingHorizontal="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="10dp">
 
             <ImageButton
                 android:id="@+id/btn_top_back"

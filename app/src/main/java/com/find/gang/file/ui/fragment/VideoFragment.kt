@@ -44,24 +44,24 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
         @JvmStatic
         fun newInstance(channel: TvChannel, autoPlay: Boolean = true): VideoFragment {
             return VideoFragment().apply {
-                arguments = bundleOf(
-                    ARG_CHANNEL_NAME to channel.name,
-                    ARG_STREAM_URL to channel.primaryUrl,
-                    ARG_STREAM_URLS to ArrayList(channel.urls),
-                    ARG_AUTO_PLAY to autoPlay
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_CHANNEL_NAME, channel.name)
+                    putString(ARG_STREAM_URL, channel.primaryUrl)
+                    putStringArrayList(ARG_STREAM_URLS, ArrayList(channel.urls))
+                    putBoolean(ARG_AUTO_PLAY, autoPlay)
+                }
             }
         }
 
         @JvmStatic
         fun newInstance(url: String, autoPlay: Boolean = true, title: String = ""): VideoFragment {
             return VideoFragment().apply {
-                arguments = bundleOf(
-                    ARG_CHANNEL_NAME to title,
-                    ARG_STREAM_URL to url,
-                    ARG_STREAM_URLS to arrayListOf(url),
-                    ARG_AUTO_PLAY to autoPlay
-                )
+                arguments = Bundle().apply {
+                    putString(ARG_CHANNEL_NAME, title)
+                    putString(ARG_STREAM_URL, url)
+                    putStringArrayList(ARG_STREAM_URLS, arrayListOf(url))
+                    putBoolean(ARG_AUTO_PLAY, autoPlay)
+                }
             }
         }
     }
