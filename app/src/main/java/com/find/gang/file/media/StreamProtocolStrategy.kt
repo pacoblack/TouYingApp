@@ -52,21 +52,21 @@ class RtmpStrategy : StreamProtocolStrategy {
     }
 }
 
-/** 3. HLS (.m3u8) 直播/点播策略（支持边播边存 + 分片预缓存） */
+/** 3. HLS (.m3u8) 直播/点播策略（智能跳过 m3u8 清单缓存 + 支持点播分片边播边存） */
 @OptIn(UnstableApi::class)
 class HlsStrategy : StreamProtocolStrategy {
     override val protocolName = "HLS (m3u8)"
     override val supportsOfflineCache = true
 
     override fun createMediaSource(context: Context, url: String): MediaSource {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
-        return HlsMediaSource.Factory(cacheFactory)
-            .setAllowChunklessPreparation(true)
+        val smartFactory = MediaCacheSingleton.createSmartStreamCacheFactory(context)
+        return HlsMediaSource.Factory(smartFactory)
+            .setAllowChunklessPreparation(false)
             .createMediaSource(MediaItem.fromUri(url.trim().toUri()))
     }
 
     override fun createDownloader(context: Context, url: String): Downloader {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
+        val cacheFactory = MediaCacheSingleton.createOfflineCacheDataSourceFactory(context)
         val mediaItem = MediaItem.fromUri(url.trim().toUri())
         return HlsDownloader.Factory(cacheFactory).create(mediaItem)
     }
@@ -79,13 +79,13 @@ class DashStrategy : StreamProtocolStrategy {
     override val supportsOfflineCache = true
 
     override fun createMediaSource(context: Context, url: String): MediaSource {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
-        return DashMediaSource.Factory(cacheFactory)
+        val smartFactory = MediaCacheSingleton.createSmartStreamCacheFactory(context)
+        return DashMediaSource.Factory(smartFactory)
             .createMediaSource(MediaItem.fromUri(url.trim().toUri()))
     }
 
     override fun createDownloader(context: Context, url: String): Downloader {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
+        val cacheFactory = MediaCacheSingleton.createOfflineCacheDataSourceFactory(context)
         val mediaItem = MediaItem.fromUri(url.trim().toUri())
         return DashDownloader.Factory(cacheFactory).create(mediaItem)
     }
@@ -98,13 +98,13 @@ class SmoothStreamingStrategy : StreamProtocolStrategy {
     override val supportsOfflineCache = true
 
     override fun createMediaSource(context: Context, url: String): MediaSource {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
-        return SsMediaSource.Factory(cacheFactory)
+        val smartFactory = MediaCacheSingleton.createSmartStreamCacheFactory(context)
+        return SsMediaSource.Factory(smartFactory)
             .createMediaSource(MediaItem.fromUri(url.trim().toUri()))
     }
 
     override fun createDownloader(context: Context, url: String): Downloader {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
+        val cacheFactory = MediaCacheSingleton.createOfflineCacheDataSourceFactory(context)
         val mediaItem = MediaItem.fromUri(url.trim().toUri())
         return SsDownloader.Factory(cacheFactory).create(mediaItem)
     }
@@ -117,13 +117,13 @@ class ProgressiveMediaStrategy : StreamProtocolStrategy {
     override val supportsOfflineCache = true
 
     override fun createMediaSource(context: Context, url: String): MediaSource {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
-        return DefaultMediaSourceFactory(cacheFactory)
+        val smartFactory = MediaCacheSingleton.createSmartStreamCacheFactory(context)
+        return DefaultMediaSourceFactory(smartFactory)
             .createMediaSource(MediaItem.fromUri(url.trim().toUri()))
     }
 
     override fun createDownloader(context: Context, url: String): Downloader {
-        val cacheFactory = MediaCacheSingleton.createCacheDataSourceFactory(context)
+        val cacheFactory = MediaCacheSingleton.createOfflineCacheDataSourceFactory(context)
         return ProgressiveDownloader(MediaItem.fromUri(url.trim().toUri()), cacheFactory)
     }
 }

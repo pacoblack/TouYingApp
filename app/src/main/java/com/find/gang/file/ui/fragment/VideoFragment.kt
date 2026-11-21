@@ -30,7 +30,7 @@ class VideoFragment : BaseTvFragment<FragmentVideoBinding>() {
     companion object {
         private const val ARG_STREAM_URL = "arg_stream_url"
         private const val ARG_AUTO_PLAY = "arg_auto_play"
-        private const val DEFAULT_TEST_URL = "http://ali-m-l.cztv.com/channels/lantian/channel21/1080p.m3u8"
+        private const val DEFAULT_TEST_URL = "http://bp-resource-dfl.bestv.cn/148/3/video.m3u8"
 
         /**
          * 外部调用标准入口：创建带有初始播放地址的 VideoFragment
