@@ -34,6 +34,7 @@ class Media3ControllerFacade(
 
     val player: ExoPlayer = ExoPlayer.Builder(context.applicationContext)
         .setLoadControl(loadControl)
+        .setSeekParameters(androidx.media3.exoplayer.SeekParameters.CLOSEST_SYNC)
         .build()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)

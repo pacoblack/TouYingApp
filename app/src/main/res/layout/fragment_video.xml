@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="#F7F9FC">
 
-        <!-- 顶部：16:9 手机视频播放器 -->
+        <!-- 顶部：16:9 手机视频播放器（自带可拖动进度条 + 全屏按钮） -->
         <androidx.media3.ui.PlayerView
             android:id="@+id/player_view"
             android:layout_width="0dp"
@@ -28,8 +28,9 @@
             app:show_buffering="when_playing"
             app:use_controller="true" />
 
-        <!-- 底部：可滚动操作区域 -->
+        <!-- 底部：可滚动操作区域（增加了 id 供全屏时隐藏） -->
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_controls"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:fillViewport="true"
@@ -53,7 +54,6 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <!-- 原生输入框 -->
                 <EditText
                     android:id="@+id/et_stream_url"
                     android:layout_width="match_parent"
@@ -68,7 +68,6 @@
                     android:textColorHint="#74777F"
                     android:textSize="14sp" />
 
-                <!-- 按钮 1：立即播放 -->
                 <Button
                     android:id="@+id/btn_play"
                     android:layout_width="match_parent"
@@ -78,7 +77,6 @@
                     android:text="立即播放（边播边存）"
                     android:textColor="#FFFFFF" />
 
-                <!-- 按钮 2 & 3：并排排列 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -106,7 +104,6 @@
                         android:textColor="#1A1C1E" />
                 </LinearLayout>
 
-                <!-- 按钮 4：停止后台缓存 -->
                 <Button
                     android:id="@+id/btn_stop_cache"
                     android:layout_width="match_parent"
@@ -117,7 +114,6 @@
                     android:text="停止后台缓存"
                     android:textColor="#410002" />
 
-                <!-- 状态与缓存信息容器 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
